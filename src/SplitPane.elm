@@ -1,75 +1,65 @@
-module SplitPane
-    exposing
-        ( view
-        , ViewConfig
-        , createViewConfig
-        , createCustomSplitter
-        , CustomSplitter
-        , HtmlDetails
-        , State
-        , Msg
-        , Orientation(..)
-        , SizeUnit(..)
-        , subscriptions
-        , update
-        , customUpdate
-        , UpdateConfig
-        , createUpdateConfig
-        , init
-        , configureSplitter
-        , orientation
-        , draggable
-        , percentage
-        , px
-        )
+module SplitPane exposing
+    ( view, createViewConfig
+    , update, subscriptions
+    , State, init, configureSplitter, orientation, draggable
+    , percentage, px
+    , Msg, Orientation(..), SizeUnit(..), ViewConfig, UpdateConfig, CustomSplitter, HtmlDetails
+    , customUpdate, createUpdateConfig, createCustomSplitter
+    )
 
-{-|
+{-| This is a split pane view library. Can be used to split views into multiple parts with a splitter between them.
 
-This is a split pane view library. Can be used to split views into multiple parts with a splitter between them.
-
-Check out the [examples][] to see how it works.
+Check out the [examples] to see how it works.
 
 [examples]: https://github.com/doodledood/elm-split-pane/tree/master/examples
+
 
 # View
 
 @docs view, createViewConfig
 
+
 # Update
 
 @docs update, subscriptions
+
 
 # State
 
 @docs State, init, configureSplitter, orientation, draggable
 
+
 # Helpers
 
 @docs percentage, px
+
 
 # Definitions
 
 @docs Msg, Orientation, SizeUnit, ViewConfig, UpdateConfig, CustomSplitter, HtmlDetails
 
+
 # Customization
 
 @docs customUpdate, createUpdateConfig, createCustomSplitter
+
 -}
 
-import Html exposing (Html, span, div, Attribute)
-import Html.Attributes exposing (class, style)
-import Html.Events exposing (onWithOptions)
-import Mouse
-import Json.Decode as Json exposing (field, at)
-import Maybe
 import Bound
     exposing
         ( Bounded
-        , getValue
-        , updateValue
         , createBound
         , createBounded
+        , getValue
+        , updateValue
         )
+import Html exposing (Attribute, Html, div, span)
+import Html.Attributes exposing (class, style)
+import Html.Events exposing (onWithOptions)
+import Json.Decode as Json exposing (at, field)
+import Maybe
+import Mouse
+
 
 
 -- MODEL
@@ -147,6 +137,7 @@ draggable isDraggable (State state) =
             | dragState =
                 if isDraggable then
                     Draggable Nothing
+
                 else
                     NotDraggable
         }
@@ -182,7 +173,7 @@ percentage x bound =
                 Nothing ->
                     createBound 0.0 1.0
     in
-        Percentage <| createBounded x newBound
+    Percentage <| createBounded x newBound
 
 
 {-| Creates a pixel size unit from an int
@@ -198,7 +189,7 @@ px x bound =
                 Nothing ->
                     createBound 0 9999999999
     in
-        Px <| createBounded x newBound
+    Px <| createBounded x newBound
 
 
 
@@ -208,6 +199,7 @@ px x bound =
 {-| Initialize a new model.
 
         init Horizontal
+
 -}
 init : Orientation -> State
 init orientation =
@@ -246,7 +238,7 @@ type UpdateConfig msg
 
 
 {-| Creates the update configuration.
-    Gives you the option to respond to various things that happen.
+Gives you the option to respond to various things that happen.
 
     For example:
     - Draw a different view when the pane is resized:
@@ -256,6 +248,7 @@ type UpdateConfig msg
             , onResizeStarted Nothing
             , onResizeEnded Nothing
             }
+
 -}
 createUpdateConfig :
     { onResize : SizeUnit -> Maybe msg
@@ -283,7 +276,7 @@ update msg model =
                 msg
                 model
     in
-        updatedModel
+    updatedModel
 
 
 {-| Updates internal model using custom configuration.
@@ -325,24 +318,24 @@ customUpdate (UpdateConfig updateConfig) msg (State state) =
                 newSplitterPosition =
                     resize state.orientation state.splitterPosition step paneInfo.width paneInfo.height
             in
-                ( State
-                    { state
-                        | splitterPosition = newSplitterPosition
-                        , dragState =
-                            Draggable <|
-                                Just
-                                    { paneInfo =
-                                        { width = paneInfo.width
-                                        , height = paneInfo.height
-                                        }
-                                    , anchor =
-                                        { x = newRequestedPosition.x
-                                        , y = newRequestedPosition.y
-                                        }
+            ( State
+                { state
+                    | splitterPosition = newSplitterPosition
+                    , dragState =
+                        Draggable <|
+                            Just
+                                { paneInfo =
+                                    { width = paneInfo.width
+                                    , height = paneInfo.height
                                     }
-                    }
-                , updateConfig.onResize newSplitterPosition
-                )
+                                , anchor =
+                                    { x = newRequestedPosition.x
+                                    , y = newRequestedPosition.y
+                                    }
+                                }
+                }
+            , updateConfig.onResize newSplitterPosition
+            )
 
         _ ->
             ( State state, Nothing )
@@ -418,6 +411,7 @@ createDefaultSplitterDetails orientation dragState =
                 , children =
                     []
                 }
+
 -}
 createCustomSplitter :
     (Msg -> msg)
@@ -475,6 +469,7 @@ createViewConfig { toMsg, customSplitter } =
         secondView : Html a
         secondView =
             img [ src "http://2.bp.blogspot.com/-pATX0YgNSFs/VP-82AQKcuI/AAAAAAAALSU/Vet9e7Qsjjw/s1600/Cat-hd-wallpapers.jpg" ] []
+
 -}
 view : ViewConfig msg -> Html msg -> Html msg -> State -> Html msg
 view (ViewConfig viewConfig) firstView secondView (State state) =
@@ -482,22 +477,22 @@ view (ViewConfig viewConfig) firstView secondView (State state) =
         splitter =
             getConcreteSplitter viewConfig state.orientation state.dragState
     in
-        div
-            [ class "pane-container"
-            , paneContainerStyle state.orientation
+    div
+        [ class "pane-container"
+        , paneContainerStyle state.orientation
+        ]
+        [ div
+            [ class "pane-first-view"
+            , firstChildViewStyle (State state)
             ]
-            [ div
-                [ class "pane-first-view"
-                , firstChildViewStyle (State state)
-                ]
-                [ firstView ]
-            , splitter
-            , div
-                [ class "pane-second-view"
-                , secondChildViewStyle (State state)
-                ]
-                [ secondView ]
+            [ firstView ]
+        , splitter
+        , div
+            [ class "pane-second-view"
+            , secondChildViewStyle (State state)
             ]
+            [ secondView ]
+        ]
 
 
 getConcreteSplitter :
@@ -551,41 +546,41 @@ firstChildViewStyle (State state) =
                 v =
                     (toString <| toFloat (getValue px)) ++ "px"
             in
-                case state.orientation of
-                    Horizontal ->
-                        style
-                            [ ( "display", "flex" )
-                            , ( "width", v )
-                            , ( "height", "100%" )
-                            , ( "overflow", "hidden" )
-                            , ( "boxSizing", "border-box" )
-                            , ( "position", "relative" )
-                            ]
+            case state.orientation of
+                Horizontal ->
+                    style
+                        [ ( "display", "flex" )
+                        , ( "width", v )
+                        , ( "height", "100%" )
+                        , ( "overflow", "hidden" )
+                        , ( "boxSizing", "border-box" )
+                        , ( "position", "relative" )
+                        ]
 
-                    Vertical ->
-                        style
-                            [ ( "display", "flex" )
-                            , ( "width", "100%" )
-                            , ( "height", v )
-                            , ( "overflow", "hidden" )
-                            , ( "boxSizing", "border-box" )
-                            , ( "position", "relative" )
-                            ]
+                Vertical ->
+                    style
+                        [ ( "display", "flex" )
+                        , ( "width", "100%" )
+                        , ( "height", v )
+                        , ( "overflow", "hidden" )
+                        , ( "boxSizing", "border-box" )
+                        , ( "position", "relative" )
+                        ]
 
         Percentage p ->
             let
                 v =
                     toString <| getValue p
             in
-                style
-                    [ ( "display", "flex" )
-                    , ( "flex", v )
-                    , ( "width", "100%" )
-                    , ( "height", "100%" )
-                    , ( "overflow", "hidden" )
-                    , ( "boxSizing", "border-box" )
-                    , ( "position", "relative" )
-                    ]
+            style
+                [ ( "display", "flex" )
+                , ( "flex", v )
+                , ( "width", "100%" )
+                , ( "height", "100%" )
+                , ( "overflow", "hidden" )
+                , ( "boxSizing", "border-box" )
+                , ( "position", "relative" )
+                ]
 
 
 secondChildViewStyle : State -> Attribute a
@@ -607,15 +602,15 @@ secondChildViewStyle (State state) =
                 v =
                     toString <| 1 - getValue p
             in
-                style
-                    [ ( "display", "flex" )
-                    , ( "flex", v )
-                    , ( "width", "100%" )
-                    , ( "height", "100%" )
-                    , ( "overflow", "hidden" )
-                    , ( "boxSizing", "border-box" )
-                    , ( "position", "relative" )
-                    ]
+            style
+                [ ( "display", "flex" )
+                , ( "flex", v )
+                , ( "width", "100%" )
+                , ( "height", "100%" )
+                , ( "overflow", "hidden" )
+                , ( "boxSizing", "border-box" )
+                , ( "position", "relative" )
+                ]
 
 
 defaultVerticalSplitterStyle : DragState -> Attribute a
@@ -628,12 +623,13 @@ defaultVerticalSplitterStyle dragState =
                , ( "borderTop", "5px solid rgba(255, 255, 255, 0)" )
                , ( "borderBottom", "5px solid rgba(255, 255, 255, 0)" )
                ]
-            ++ case dragState of
-                Draggable _ ->
-                    [ ( "cursor", "row-resize" ) ]
+            ++ (case dragState of
+                    Draggable _ ->
+                        [ ( "cursor", "row-resize" ) ]
 
-                NotDraggable ->
-                    []
+                    NotDraggable ->
+                        []
+               )
         )
 
 
@@ -647,12 +643,13 @@ defaultHorizontalSplitterStyle dragState =
                , ( "borderLeft", "5px solid rgba(255, 255, 255, 0)" )
                , ( "borderRight", "5px solid rgba(255, 255, 255, 0)" )
                ]
-            ++ case dragState of
-                Draggable _ ->
-                    [ ( "cursor", "col-resize" ) ]
+            ++ (case dragState of
+                    Draggable _ ->
+                        [ ( "cursor", "col-resize" ) ]
 
-                NotDraggable ->
-                    []
+                    NotDraggable ->
+                        []
+               )
         )
 
 
@@ -701,7 +698,7 @@ onTouchMove toMsg =
 
 {-| The position of the touch relative to the whole document. So if you are
 scrolled down a bunch, you are still getting a coordinate relative to the
-very top left corner of the *whole* document.
+very top left corner of the _whole_ document.
 -}
 type alias DOMInfo =
     { x : Maybe Int

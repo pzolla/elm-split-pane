@@ -1,18 +1,6 @@
-module Bound
-    exposing
-        ( Bound
-        , Bounded
-        , putValue
-        , getValue
-        , updateValue
-        , putBound
-        , createBound
-        , createBounded
-        )
+module Bound exposing (Bound, Bounded, getValue, putValue, updateValue, putBound, createBound, createBounded)
 
-{-|
-
-This module defines a value that is between two other values.
+{-| This module defines a value that is between two other values.
 
 @docs Bound, Bounded, getValue, putValue, updateValue, putBound, createBound, createBounded
 
