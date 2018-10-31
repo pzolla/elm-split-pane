@@ -55,10 +55,9 @@ import Bound
         )
 import Html exposing (Attribute, Html, div, span)
 import Html.Attributes exposing (class, style)
-import Html.Events exposing (onWithOptions)
+import Html.Events
 import Json.Decode as Json exposing (at, field)
 import Maybe
-import Mouse
 
 
 
