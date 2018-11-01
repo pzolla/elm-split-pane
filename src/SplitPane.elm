@@ -1,7 +1,7 @@
 module SplitPane exposing
     ( view, createViewConfig
     , update, subscriptions
-    , State, init, configureSplitter, orientation, draggable
+    , State, init, configureSplitter, draggable
     , percentage, px
     , Msg, Orientation(..), SizeUnit(..), ViewConfig, UpdateConfig, CustomSplitter, HtmlDetails
     , customUpdate, createUpdateConfig, createCustomSplitter
@@ -201,9 +201,9 @@ px x bound =
 
 -}
 init : Orientation -> State
-init orientation =
+init orientation1 =
     State
-        { orientation = orientation
+        { orientation = orientation1
         , splitterPosition = percentage 0.5 Nothing
         , dragState = Draggable Nothing
         }
@@ -341,20 +341,20 @@ customUpdate (UpdateConfig updateConfig) msg (State state) =
 
 
 resize : Orientation -> SizeUnit -> Position -> Int -> Int -> SizeUnit
-resize orientation splitterPosition step paneWidth paneHeight =
-    case orientation of
+resize orientation2 splitterPosition step paneWidth paneHeight =
+    case orientation2 of
         Horizontal ->
             case splitterPosition of
-                Px px ->
-                    Px <| updateValue (\v -> v + step.x) px
+                Px px1 ->
+                    Px <| updateValue (\v -> v + step.x) px1
 
                 Percentage p ->
                     Percentage <| updateValue (\v -> v + toFloat step.x / toFloat paneWidth) p
 
         Vertical ->
             case splitterPosition of
-                Px px ->
-                    Px <| updateValue (\v -> v + step.y) px
+                Px px1 ->
+                    Px <| updateValue (\v -> v + step.y) px1
 
                 Percentage p ->
                     Percentage <| updateValue (\v -> v + toFloat step.y / toFloat paneHeight) p
@@ -379,8 +379,8 @@ type CustomSplitter msg
 
 
 createDefaultSplitterDetails : Orientation -> DragState -> HtmlDetails msg
-createDefaultSplitterDetails orientation dragState =
-    case orientation of
+createDefaultSplitterDetails orientation3 dragState =
+    case orientation3 of
         Horizontal ->
             { attributes =
                 [ defaultHorizontalSplitterStyle dragState
@@ -501,13 +501,13 @@ getConcreteSplitter :
     -> Orientation
     -> DragState
     -> Html msg
-getConcreteSplitter viewConfig orientation dragState =
+getConcreteSplitter viewConfig orientation4 dragState =
     case viewConfig.splitter of
         Just (CustomSplitter splitter) ->
             splitter
 
         Nothing ->
-            case createCustomSplitter viewConfig.toMsg <| createDefaultSplitterDetails orientation dragState of
+            case createCustomSplitter viewConfig.toMsg <| createDefaultSplitterDetails orientation4 dragState of
                 CustomSplitter defaultSplitter ->
                     defaultSplitter
 
@@ -517,12 +517,12 @@ getConcreteSplitter viewConfig orientation dragState =
 
 
 paneContainerStyle : Orientation -> Attribute a
-paneContainerStyle orientation =
+paneContainerStyle orientation5 =
     style
         [ ( "overflow", "hidden" )
         , ( "display", "flex" )
         , ( "flexDirection"
-          , case orientation of
+          , case orientation5 of
                 Horizontal ->
                     "row"
 
@@ -540,10 +540,10 @@ paneContainerStyle orientation =
 firstChildViewStyle : State -> Attribute a
 firstChildViewStyle (State state) =
     case state.splitterPosition of
-        Px px ->
+        Px px2 ->
             let
                 v =
-                    (toString <| toFloat (getValue px)) ++ "px"
+                    (toString <| toFloat (getValue px2)) ++ "px"
             in
             case state.orientation of
                 Horizontal ->
