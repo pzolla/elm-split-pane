@@ -383,15 +383,15 @@ createDefaultSplitterDetails orientation3 dragState =
     case orientation3 of
         Horizontal ->
             { attributes =
-                [ defaultHorizontalSplitterStyle dragState
-                ]
+                 defaultHorizontalSplitterStyle dragState
+                
             , children = []
             }
 
         Vertical ->
             { attributes =
-                [ defaultVerticalSplitterStyle dragState
-                ]
+                 defaultVerticalSplitterStyle dragState
+                
             , children = []
             }
 
@@ -477,19 +477,13 @@ view (ViewConfig viewConfig) firstView secondView (State state) =
             getConcreteSplitter viewConfig state.orientation state.dragState
     in
     div
-        [ class "pane-container"
-        , paneContainerStyle state.orientation
-        ]
+        ([ class "pane-container" ] ++ paneContainerStyle state.orientation)
         [ div
-            [ class "pane-first-view"
-            , firstChildViewStyle (State state)
-            ]
+            ([ class "pane-first-view" ] ++ firstChildViewStyle (State state))
             [ firstView ]
         , splitter
         , div
-            [ class "pane-second-view"
-            , secondChildViewStyle (State state)
-            ]
+            ([ class "pane-second-view" ] ++ secondChildViewStyle (State state))
             [ secondView ]
         ]
 
@@ -516,28 +510,27 @@ getConcreteSplitter viewConfig orientation4 dragState =
 -- STYLES
 
 
-paneContainerStyle : Orientation -> Attribute a
+paneContainerStyle : Orientation -> List (Attribute msg)
 paneContainerStyle orientation5 =
-    style
-        [ ( "overflow", "hidden" )
-        , ( "display", "flex" )
-        , ( "flexDirection"
-          , case orientation5 of
-                Horizontal ->
-                    "row"
+    [ style "overflow" "hidden"
+    , style "display" "flex"
+    , style "flexDirection"
+        (case orientation5 of
+            Horizontal ->
+                "row"
 
-                Vertical ->
-                    "column"
-          )
-        , ( "justifyContent", "center" )
-        , ( "alignItems", "center" )
-        , ( "width", "100%" )
-        , ( "height", "100%" )
-        , ( "boxSizing", "border-box" )
-        ]
+            Vertical ->
+                "column"
+        )
+    , style "justifyContent" "center"
+    , style "alignItems" "center"
+    , style "width" "100%"
+    , style "height" "100%"
+    , style "boxSizing" "border-box"
+    ]
 
 
-firstChildViewStyle : State -> Attribute a
+firstChildViewStyle : State -> List (Attribute msg)
 firstChildViewStyle (State state) =
     case state.splitterPosition of
         Px px2 ->
@@ -547,122 +540,113 @@ firstChildViewStyle (State state) =
             in
             case state.orientation of
                 Horizontal ->
-                    style
-                        [ ( "display", "flex" )
-                        , ( "width", v )
-                        , ( "height", "100%" )
-                        , ( "overflow", "hidden" )
-                        , ( "boxSizing", "border-box" )
-                        , ( "position", "relative" )
-                        ]
+                    [ style "display" "flex"
+                    , style "width" v
+                    , style "height" "100%"
+                    , style "overflow" "hidden"
+                    , style "boxSizing" "border-box"
+                    , style "position" "relative"
+                    ]
 
                 Vertical ->
-                    style
-                        [ ( "display", "flex" )
-                        , ( "width", "100%" )
-                        , ( "height", v )
-                        , ( "overflow", "hidden" )
-                        , ( "boxSizing", "border-box" )
-                        , ( "position", "relative" )
-                        ]
+                    [ style "display" "flex"
+                    , style "width" "100%"
+                    , style "height" v
+                    , style "overflow" "hidden"
+                    , style "boxSizing" "border-box"
+                    , style "position" "relative"
+                    ]
 
         Percentage p ->
             let
                 v =
                     String.fromFloat <| getValue p
             in
-            style
-                [ ( "display", "flex" )
-                , ( "flex", v )
-                , ( "width", "100%" )
-                , ( "height", "100%" )
-                , ( "overflow", "hidden" )
-                , ( "boxSizing", "border-box" )
-                , ( "position", "relative" )
-                ]
+            [ style "display" "flex"
+            , style "flex" v
+            , style "width" "100%"
+            , style "height" "100%" -- pz edit
+            , style "overflow" "hidden"
+            , style "boxSizing" "border-box"
+            , style "position" "relative"
+            ]
 
 
-secondChildViewStyle : State -> Attribute a
+secondChildViewStyle : State -> List (Attribute msg)
 secondChildViewStyle (State state) =
     case state.splitterPosition of
         Px _ ->
-            style
-                [ ( "display", "flex" )
-                , ( "flex", "1" )
-                , ( "width", "100%" )
-                , ( "height", "100%" )
-                , ( "overflow", "hidden" )
-                , ( "boxSizing", "border-box" )
-                , ( "position", "relative" )
-                ]
+            [ style "display" "flex"
+            , style "flex" "1"
+            , style "width" "100%"
+            , style "height" "100%"
+            , style "overflow" "hidden"
+            , style "boxSizing" "border-box"
+            , style "position" "relative"
+            ]
 
         Percentage p ->
             let
                 v =
                     String.fromFloat <| 1 - getValue p
             in
-            style
-                [ ( "display", "flex" )
-                , ( "flex", v )
-                , ( "width", "100%" )
-                , ( "height", "100%" )
-                , ( "overflow", "hidden" )
-                , ( "boxSizing", "border-box" )
-                , ( "position", "relative" )
-                ]
+             [ style "display" "flex"
+            , style "flex" v
+            , style "width" "100%"
+            , style "height" "100%"
+            , style "overflow" "hidden"
+            , style "boxSizing" "border-box"
+            , style "position" "relative"
+            ]
 
 
-defaultVerticalSplitterStyle : DragState -> Attribute a
+defaultVerticalSplitterStyle : DragState -> List (Attribute msg)
 defaultVerticalSplitterStyle dragState =
-    style
-        (baseDefaultSplitterStyles
-            ++ [ ( "height", "11px" )
-               , ( "width", "100%" )
-               , ( "margin", "-5px 0" )
-               , ( "borderTop", "5px solid rgba(255, 255, 255, 0)" )
-               , ( "borderBottom", "5px solid rgba(255, 255, 255, 0)" )
-               ]
-            ++ (case dragState of
-                    Draggable _ ->
-                        [ ( "cursor", "row-resize" ) ]
+    baseDefaultSplitterStyles
+        ++ [ style "height" "11px"
+           , style "width" "100%"
+           , style "margin" "-5px 0"
+           , style "borderTop" "5px solid rgba(255, 255, 255, 0)"
+           , style "borderBottom" "5px solid rgba(255, 255, 255, 0)"
+           ]
+        ++ (case dragState of
+                Draggable _ ->
+                    [ style "cursor" "row-resize" ]
 
-                    NotDraggable ->
-                        []
-               )
-        )
+                NotDraggable ->
+                    []
+           )
 
 
-defaultHorizontalSplitterStyle : DragState -> Attribute a
+defaultHorizontalSplitterStyle : DragState -> List (Attribute msg)
 defaultHorizontalSplitterStyle dragState =
-    style
-        (baseDefaultSplitterStyles
-            ++ [ ( "width", "11px" )
-               , ( "height", "100%" )
-               , ( "margin", "0 -5px" )
-               , ( "borderLeft", "5px solid rgba(255, 255, 255, 0)" )
-               , ( "borderRight", "5px solid rgba(255, 255, 255, 0)" )
-               ]
-            ++ (case dragState of
-                    Draggable _ ->
-                        [ ( "cursor", "col-resize" ) ]
+     baseDefaultSplitterStyles
+        ++ [ style "width" "11px"
+           , style "height" "100%"
+           , style "margin" "0 -5px"
+           , style "borderLeft" "5px solid rgba(255, 255, 255, 0)"
+           , style "borderRight" "5px solid rgba(255, 255, 255, 0)"
+           ]
+        ++ (case dragState of
+                Draggable _ ->
+                    [ style "cursor" "col-resize" ]
 
-                    NotDraggable ->
-                        []
-               )
-        )
+                NotDraggable ->
+                    []
+           )
 
 
-baseDefaultSplitterStyles : List ( String, String )
+baseDefaultSplitterStyles : List (Attribute msg)
 baseDefaultSplitterStyles =
-    [ ( "width", "100%" )
-    , ( "background", "#000" )
-    , ( "boxSizing", "border-box" )
-    , ( "opacity", ".2" )
-    , ( "zIndex", "1" )
-    , ( "webkitUserSelect", "none" )
-    , ( "mozUserSelect", "none" )
-    , ( "userSelect", "none" )
-    , ( "backgroundClip", "padding-box" )
+    [ style "width" "100%"
+    , style "background" "#000"
+    , style "boxSizing" "border-box"
+    , style "opacity" ".2"
+    , style "zIndex" "1"
+    , style "webkitUserSelect" "none"
+    , style "mozUserSelect" "none"
+    , style "userSelect" "none"
+    , style "backgroundClip" "padding-box"
     ]
 
 
