@@ -670,29 +670,47 @@ baseDefaultSplitterStyles =
 -- EVENT HANDLERS
 
 
+customRecord :
+    Bool
+    -> Bool
+    -> msg
+    ->
+        { message : msg
+        , stopPropagation : Bool
+        , preventDefault : Bool
+        }
+customRecord stop prevent msg =
+    { message = msg, stopPropagation = stop, preventDefault = prevent }
+
+
 onMouseDown : (Msg -> msg) -> Attribute msg
 onMouseDown toMsg =
-    onWithOptions "mousedown" { preventDefault = True, stopPropagation = False } <| Json.map (toMsg << SplitterClick) domInfo
+    Html.Events.custom "mousedown" <|
+        Json.map (customRecord False True << (toMsg << SplitterClick)) domInfo
 
 
 onTouchStart : (Msg -> msg) -> Attribute msg
 onTouchStart toMsg =
-    onWithOptions "touchstart" { preventDefault = True, stopPropagation = True } <| Json.map (toMsg << SplitterClick) domInfo
+    Html.Events.custom "touchstart" <|
+        Json.map (customRecord True True << (toMsg << SplitterClick)) domInfo
 
 
 onTouchEnd : (Msg -> msg) -> Attribute msg
 onTouchEnd toMsg =
-    onWithOptions "touchend" { preventDefault = True, stopPropagation = True } <| Json.map (toMsg << SplitterLeftAlone << domInfoToPosition) domInfo
+    Html.Events.custom "touchend" <|
+        Json.map (customRecord True True << (toMsg << SplitterLeftAlone << domInfoToPosition)) domInfo
 
 
 onTouchCancel : (Msg -> msg) -> Attribute msg
 onTouchCancel toMsg =
-    onWithOptions "touchcancel" { preventDefault = True, stopPropagation = True } <| Json.map (toMsg << SplitterLeftAlone << domInfoToPosition) domInfo
+    Html.Events.custom "touchcancel" <|
+        Json.map (customRecord True True << (toMsg << SplitterLeftAlone << domInfoToPosition)) domInfo
 
 
 onTouchMove : (Msg -> msg) -> Attribute msg
 onTouchMove toMsg =
-    onWithOptions "touchmove" { preventDefault = True, stopPropagation = True } <| Json.map (toMsg << SplitterMove << domInfoToPosition) domInfo
+    Html.Events.custom "touchmove" <|
+        Json.map (customRecord True True << (toMsg << SplitterMove << domInfoToPosition)) domInfo
 
 
 {-| The position of the touch relative to the whole document. So if you are
