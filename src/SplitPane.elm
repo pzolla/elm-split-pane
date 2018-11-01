@@ -488,6 +488,23 @@ view (ViewConfig viewConfig) firstView secondView (State state) =
         ]
 
 
+viewReversed : ViewConfig msg -> Html msg -> Html msg -> State -> Html msg
+viewReversed (ViewConfig viewConfig) firstView secondView (State state) =
+    let
+        splitter =
+            getConcreteSplitter viewConfig state.orientation state.dragState
+    in
+    div
+        ([ class "pane-container" ] ++ paneContainerStyle state.orientation)
+        [ div
+            ([ class "pane-second-view" ] ++ secondChildViewStyle (State state))
+            [ secondView ]
+        , splitter
+        , div
+            ([ class "pane-first-view" ] ++ firstChildViewStyle (State state))
+            [ firstView ]
+        ]
+        
 getConcreteSplitter :
     { toMsg : Msg -> msg
     , splitter : Maybe (CustomSplitter msg)
