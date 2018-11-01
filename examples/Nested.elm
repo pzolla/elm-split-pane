@@ -1,5 +1,6 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), containerStyle, init, innerViewConfig, leftView, main, outerViewConfig, rightView, subscriptions, update, view)
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (src, style)
 import SplitPane
@@ -7,16 +8,16 @@ import SplitPane
         ( Orientation(..)
         , SizeUnit(..)
         , ViewConfig
-        , createViewConfig
         , configureSplitter
+        , createViewConfig
         , percentage
         , px
         )
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    Browser.element
         { update = update
         , init = init
         , subscriptions = subscriptions
@@ -43,18 +44,21 @@ type alias Model =
 -- INIT
 
 
-init : ( Model, Cmd a )
-init =
-    { outer =
-        SplitPane.init Horizontal
-            |> configureSplitter (percentage 0.5 <| Just ( 0.2, 0.8 ))
-        -- |> configureSplitter (px 300 <| Just ( 200, 700 ))
-    , inner =
-        SplitPane.init Vertical
-            |> configureSplitter (px 450 <| Just ( 0, 800 ))
-        -- |> configureSplitter (percentage 0.75 Nothing)
-    }
-        ! []
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( { outer =
+            SplitPane.init Horizontal
+                |> configureSplitter (percentage 0.5 <| Just ( 0.2, 0.8 ))
+
+      -- |> configureSplitter (px 300 <| Just ( 200, 700 ))
+      , inner =
+            SplitPane.init Vertical
+                |> configureSplitter (px 450 <| Just ( 0, 800 ))
+
+      -- |> configureSplitter (percentage 0.75 Nothing)
+      }
+    , Cmd.none
+    )
 
 
 
@@ -65,16 +69,18 @@ update : Msg -> Model -> ( Model, Cmd a )
 update msg model =
     case msg of
         Outer m ->
-            { model
+            ( { model
                 | outer = SplitPane.update m model.outer
-            }
-                ! []
+              }
+            , Cmd.none
+            )
 
         Inner m ->
-            { model
+            ( { model
                 | inner = SplitPane.update m model.inner
-            }
-                ! []
+              }
+            , Cmd.none
+            )
 
 
 
@@ -84,25 +90,22 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div
-        [ style
-            [ ( "width", "800px" )
-            , ( "height", "600px" )
-            ]
+        [ style "width" "800px"
+        , style "height" "600px"
         ]
         [ SplitPane.view outerViewConfig leftView (rightView model.inner) model.outer ]
 
-
 leftView : Html a
 leftView =
-    div [ containerStyle ]
+    div containerStyle
         [ img [ src "http://4.bp.blogspot.com/-s3sIvuCfg4o/VP-82RkCOGI/AAAAAAAALSY/509obByLvNw/s1600/baby-cat-wallpaper.jpg" ] [] ]
 
 
 rightView : SplitPane.State -> Html Msg
 rightView =
     SplitPane.view innerViewConfig
-        (div [ containerStyle ] [ img [ src "https://pbs.twimg.com/profile_images/378800000532546226/dbe5f0727b69487016ffd67a6689e75a.jpeg" ] [] ])
-        (div [ containerStyle ] [ img [ src "http://2.bp.blogspot.com/-pATX0YgNSFs/VP-82AQKcuI/AAAAAAAALSU/Vet9e7Qsjjw/s1600/Cat-hd-wallpapers.jpg" ] [] ])
+        (div containerStyle [ img [ src "https://pbs.twimg.com/profile_images/378800000532546226/dbe5f0727b69487016ffd67a6689e75a.jpeg" ] [] ])
+        (div containerStyle [ img [ src "http://2.bp.blogspot.com/-pATX0YgNSFs/VP-82AQKcuI/AAAAAAAALSU/Vet9e7Qsjjw/s1600/Cat-hd-wallpapers.jpg" ] [] ])
 
 
 outerViewConfig : ViewConfig Msg
@@ -121,12 +124,11 @@ innerViewConfig =
         }
 
 
-containerStyle : Attribute a
+containerStyle : List (Attribute a)
 containerStyle =
-    style
-        [ ( "width", "100%" )
-        , ( "height", "100%" )
-        ]
+    [ style "width" "100%"
+    , style "height" "100%"
+    ]
 
 
 
