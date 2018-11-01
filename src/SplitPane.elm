@@ -44,7 +44,7 @@ Check out the [examples] to see how it works.
 @docs customUpdate, createUpdateConfig, createCustomSplitter
 
 -}
-
+import Browser.Events
 import Bound
     exposing
         ( Bounded
@@ -751,9 +751,16 @@ subscriptions (State state) =
     case state.dragState of
         Draggable (Just _) ->
             Sub.batch
-                [ Mouse.moves SplitterMove
-                , Mouse.ups SplitterLeftAlone
+                [ Browser.Events.onMouseMove <| Json.map SplitterMove positionDecoder
+                , Browser.Events.onMouseUp <| Json.map SplitterLeftAlone positionDecoder
                 ]
 
         _ ->
             Sub.none
+
+
+positionDecoder : Json.Decoder Position
+positionDecoder =
+    Json.map2 Position
+        (Json.field "pageX" Json.int)
+        (Json.field "pageY" Json.int)
