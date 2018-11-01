@@ -1,22 +1,23 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), firstView, init, main, myCustomSplitter, secondView, subscriptions, update, view, viewConfig)
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (src, style)
 import Html.Events exposing (onClick)
 import Maybe
 import SplitPane
     exposing
-        ( Orientation(..)
-        , CustomSplitter
-        , createCustomSplitter
+        ( CustomSplitter
+        , Orientation(..)
         , ViewConfig
+        , createCustomSplitter
         , createViewConfig
         )
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    Browser.element
         { update = update
         , init = init
         , subscriptions = subscriptions
@@ -43,8 +44,8 @@ type Msg
 -- INIT
 
 
-init : ( Model, Cmd a )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( { pane =
             SplitPane.init Horizontal
       , message = Nothing
@@ -75,10 +76,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ div
-            [ style
-                [ ( "width", "800px" )
-                , ( "height", "600px" )
-                ]
+            [ style "width" "800px"
+            , style "height" "600px"
             ]
             [ SplitPane.view viewConfig firstView secondView model.pane ]
         , text <| Maybe.withDefault "" model.message
@@ -89,12 +88,10 @@ myCustomSplitter : CustomSplitter Msg
 myCustomSplitter =
     createCustomSplitter PaneMsg
         { attributes =
-            [ style
-                [ ( "width", "40px" )
-                , ( "height", "600px" )
-                , ( "background", "lightcoral" )
-                , ( "cursor", "col-resize" )
-                ]
+            [ style "width" "40px"
+            , style "height" "600px"
+            , style "background" "lightcoral"
+            , style "cursor" "col-resize"
             ]
         , children =
             [ button [ onClick CustomSplitterButtonClick ] [ text "click me" ] ]
