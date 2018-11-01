@@ -215,11 +215,11 @@ init orientation1 =
 
 domInfoToPosition : DOMInfo -> Position
 domInfoToPosition { x, y, touchX, touchY } =
-    case ( x, y, touchX, touchY ) of
-        ( _, _, Just posX, Just posY ) ->
+     case ( ( x, y ), ( touchX, touchY ) ) of
+        ( ( _, _ ), ( Just posX, Just posY ) ) ->
             { x = posX, y = posY }
 
-        ( Just posX, Just posY, _, _ ) ->
+        ( ( Just posX, Just posY ), ( _, _ ) ) ->
             { x = posX, y = posY }
 
         _ ->
