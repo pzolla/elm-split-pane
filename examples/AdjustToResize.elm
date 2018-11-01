@@ -1,21 +1,22 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), ViewSize(..), chooseViewSizesBasedOnSplitterPosition, init, largeView, main, mediumView, smallView, subscriptions, toView, update, updateConfig, view, viewConfig)
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import SplitPane
     exposing
         ( Orientation(..)
         , SizeUnit(..)
-        , ViewConfig
         , UpdateConfig
-        , createViewConfig
+        , ViewConfig
         , createUpdateConfig
+        , createViewConfig
         )
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    Browser.element
         { update = update
         , init = init
         , subscriptions = subscriptions
@@ -49,8 +50,8 @@ type Msg
 -- INIT
 
 
-init : ( Model, Cmd a )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( { pane =
             SplitPane.init Horizontal
       , leftViewSize = Medium
@@ -75,23 +76,24 @@ update msg model =
                 updatedModel =
                     { model | pane = updatedPane }
             in
-                case whatHappened of
-                    Nothing ->
-                        updatedModel ! []
+            case whatHappened of
+                Nothing ->
+                    ( updatedModel, Cmd.none )
 
-                    Just m ->
-                        update m updatedModel
+                Just m ->
+                    update m updatedModel
 
         ResizeViews newPosition ->
             let
                 ( leftViewNewSize, rightViewNewSize ) =
                     chooseViewSizesBasedOnSplitterPosition newPosition
             in
-                { model
-                    | leftViewSize = leftViewNewSize
-                    , rightViewSize = rightViewNewSize
-                }
-                    ! []
+            ( { model
+                | leftViewSize = leftViewNewSize
+                , rightViewSize = rightViewNewSize
+              }
+            , Cmd.none
+            )
 
 
 updateConfig : UpdateConfig Msg
@@ -109,16 +111,20 @@ chooseViewSizesBasedOnSplitterPosition splitterPosition =
         Px ( p, _ ) ->
             if p < 200 then
                 ( Small, Large )
+
             else if p < 600 then
                 ( Medium, Medium )
+
             else
                 ( Large, Small )
 
         Percentage ( p, _ ) ->
             if p < 0.25 then
                 ( Small, Large )
+
             else if p < 0.75 then
                 ( Medium, Medium )
+
             else
                 ( Large, Small )
 
@@ -133,13 +139,11 @@ view model =
         ( firstView, secondView ) =
             ( toView model.leftViewSize, toView model.rightViewSize )
     in
-        div
-            [ style
-                [ ( "width", "800px" )
-                , ( "height", "600px" )
-                ]
-            ]
-            [ SplitPane.view viewConfig firstView secondView model.pane ]
+    div
+        [ style "width" "800px"
+        , style "height" "600px"
+        ]
+        [ SplitPane.view viewConfig firstView secondView model.pane ]
 
 
 viewConfig : ViewConfig Msg
@@ -166,8 +170,7 @@ toView size =
 smallView : Html a
 smallView =
     div
-        [ style
-            [ ( "background", "lightblue" ) ]
+        [ style "background" "lightblue"
         ]
         [ text "small" ]
 
@@ -175,8 +178,7 @@ smallView =
 mediumView : Html a
 mediumView =
     div
-        [ style
-            [ ( "background", "lightgreen" ) ]
+        [ style "background" "lightgreen"
         ]
         [ text "medium" ]
 
@@ -184,8 +186,7 @@ mediumView =
 largeView : Html a
 largeView =
     div
-        [ style
-            [ ( "background", "lightcoral" ) ]
+        [ style "background" "lightcoral"
         ]
         [ text "large" ]
 
