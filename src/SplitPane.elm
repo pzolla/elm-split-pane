@@ -677,12 +677,15 @@ customRecord :
     -> Bool
     -> msg
     ->
-        { message : msg
-        , stopPropagation : Bool
+        { stopPropagation : Bool
         , preventDefault : Bool
+        , message : msg
         }
 customRecord stop prevent msg =
-    { message = msg, stopPropagation = stop, preventDefault = prevent }
+    { stopPropagation = stop
+    , preventDefault = prevent
+    , message = msg
+    }
 
 
 onMouseDown : (Msg -> msg) -> Attribute msg
