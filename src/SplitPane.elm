@@ -1,10 +1,11 @@
 module SplitPane exposing
     ( view, createViewConfig
     , update, subscriptions
-    , State, init, configureSplitter, draggable
+    , State, init, configureSplitter
     , percentage, px
-    , Msg, Orientation(..), SizeUnit(..), ViewConfig, UpdateConfig, CustomSplitter, HtmlDetails
-    , customUpdate, createUpdateConfig, createCustomSplitter
+    , Msg(..), Orientation(..), SizeUnit, ViewConfig, CustomSplitter
+    , createCustomSplitter
+    , viewReversed
     )
 
 {-| This is a split pane view library. Can be used to split views into multiple parts with a splitter between them.
@@ -44,7 +45,7 @@ Check out the [examples] to see how it works.
 @docs customUpdate, createUpdateConfig, createCustomSplitter
 
 -}
-import Browser.Events
+
 import Bound
     exposing
         ( Bounded
@@ -53,6 +54,7 @@ import Bound
         , getValue
         , updateValue
         )
+import Browser.Events
 import Html exposing (Attribute, Html, div, span)
 import Html.Attributes exposing (class, style)
 import Html.Events
@@ -215,7 +217,7 @@ init orientation1 =
 
 domInfoToPosition : DOMInfo -> Position
 domInfoToPosition { x, y, touchX, touchY } =
-     case ( ( x, y ), ( touchX, touchY ) ) of
+    case ( ( x, y ), ( touchX, touchY ) ) of
         ( ( _, _ ), ( Just posX, Just posY ) ) ->
             { x = posX, y = posY }
 
@@ -383,15 +385,13 @@ createDefaultSplitterDetails orientation3 dragState =
     case orientation3 of
         Horizontal ->
             { attributes =
-                 defaultHorizontalSplitterStyle dragState
-                
+                defaultHorizontalSplitterStyle dragState
             , children = []
             }
 
         Vertical ->
             { attributes =
-                 defaultVerticalSplitterStyle dragState
-                
+                defaultVerticalSplitterStyle dragState
             , children = []
             }
 
@@ -504,7 +504,8 @@ viewReversed (ViewConfig viewConfig) firstView secondView (State state) =
             ([ class "pane-first-view" ] ++ firstChildViewStyle (State state))
             [ firstView ]
         ]
-        
+
+
 getConcreteSplitter :
     { toMsg : Msg -> msg
     , splitter : Maybe (CustomSplitter msg)
@@ -607,7 +608,7 @@ secondChildViewStyle (State state) =
                 v =
                     String.fromFloat <| 1 - getValue p
             in
-             [ style "display" "flex"
+            [ style "display" "flex"
             , style "flex" v
             , style "width" "100%"
             , style "height" "100%"
@@ -637,7 +638,7 @@ defaultVerticalSplitterStyle dragState =
 
 defaultHorizontalSplitterStyle : DragState -> List (Attribute msg)
 defaultHorizontalSplitterStyle dragState =
-     baseDefaultSplitterStyles
+    baseDefaultSplitterStyles
         ++ [ style "width" "11px"
            , style "height" "100%"
            , style "margin" "0 -5px"
